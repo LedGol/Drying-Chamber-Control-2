@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import EnvironmentMonitor from "../components/EnvironmentMonitor";
 import ManualControlPanel from "../components/ManualControlPanel";
 import AutomaticControlPanel from "../components/AutomaticControlPanel";
@@ -31,6 +31,22 @@ interface ChamberData {
 
 const ChamberDetail: React.FC = () => {
   const { chamberId } = useParams<{ chamberId: string }>();
+  const navigate = useNavigate();
+
+  // Navigation buttons for desktop users
+  const goToPreviousChamber = () => {
+    const currentId = parseInt(chamberId || "1");
+    if (currentId > 1) {
+      navigate(`/chamber/${currentId - 1}`);
+    }
+  };
+
+  const goToNextChamber = () => {
+    const currentId = parseInt(chamberId || "1");
+    if (currentId < 3) {
+      navigate(`/chamber/${currentId + 1}`);
+    }
+  };
 
   // Mock data - in a real application, this would come from an API
   const [chamberData, setChamberData] = useState<ChamberData>({
@@ -92,7 +108,23 @@ const ChamberDetail: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4 bg-white min-h-screen">
-      <h1 className="text-2xl font-bold mb-6">{chamberData.name}</h1>
+      <div className="flex items-center justify-between mb-6">
+        <button
+          onClick={goToPreviousChamber}
+          disabled={parseInt(chamberId || "1") <= 1}
+          className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <h1 className="text-2xl font-bold">{chamberData.name}</h1>
+        <button
+          onClick={goToNextChamber}
+          disabled={parseInt(chamberId || "1") >= 3}
+          className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-gray-50 p-4 rounded-lg shadow">
